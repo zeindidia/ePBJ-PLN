@@ -427,7 +427,7 @@ function getSettingMaster() {
     let result = { 
       syaratBayar: [], alatTeknik: [], alatK3: [], jenisKontrak: [], 
       klasifPenyedia: [], klasifBU: [], bidang: [], pendidikan: [], 
-      jabatan: [], serkom: [], hariLibur: [] 
+      jabatan: [], serkom: [], hariLibur: [], syaratUmum: [] // Tambahan syaratUmum
     };
     
     for (let i = 1; i < data.length; i++) {
@@ -459,6 +459,7 @@ function getSettingMaster() {
       else if (kategori === 'Jabatan CV') result.jabatan.push({val: value, ket: ket});
       else if (kategori === 'Serkom') result.serkom.push({val: value, ket: ket});
       else if (kategori === 'Hari Libur') result.hariLibur.push({val: value, ket: ket});
+      else if (kategori === 'Syarat Umum') result.syaratUmum.push({val: value, ket: ket}); // Tambahan ini
     }
     
     return { success: true, data: result };
@@ -509,4 +510,27 @@ function hapusDataSettingMaster(kategori, val) {
     }
     return { success: false, message: "Data tidak ditemukan" };
   } catch(e) { return { success: false, message: e.toString() }; }
+}
+
+// --- FUNGSI HAPUS DATA INISIASI PEKERJAAN ---
+function deleteDataPekerjaan(idRencana) {
+  try {
+    const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName('Data_PBJ');
+    if (!sheet) throw new Error("Sheet 'Data_PBJ' tidak ditemukan.");
+    
+    const data = sheet.getDataRange().getValues();
+    
+    // Looping mencari baris dengan ID_Rencana yang cocok (kolom index 0)
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === idRencana) {
+        sheet.deleteRow(i + 1); // +1 karena index sheet mulai dari 1, sedangkan array mulai 0
+        return { status: 'success', message: 'Data inisiasi berhasil dihapus dari Spreadsheet!' };
+      }
+    }
+    
+    return { status: 'error', message: 'Data inisiasi dengan ID tersebut tidak ditemukan.' };
+  } catch (error) {
+    Logger.log(error);
+    return { status: 'error', message: error.toString() };
+  }
 }
